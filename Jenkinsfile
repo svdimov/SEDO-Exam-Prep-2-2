@@ -1,34 +1,35 @@
-pipeline{
+pipeline {
     agent any
-
     stages{
         stage("Restore dependencies"){
-            steps{
-                bat 'dotnet restore'
-            }
-            post{
-                failure{
-                    echo "Step failed"
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'origin/main'
                 }
             }
-        }
-
-        stage("Build solution"){
             steps{
-                bat 'dotnet build --no-restore'
+                bat "dotnet restore"
             }
         }
-
-        stage("Run tests"){
+        stage("Build the project"){
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'origin/main'
+                }
+            }
             steps{
-                bat 'dotnet test --no-build --verbosity normal'
+                bat "dotnet build --no-restore"
             }
         }
-    }
-
-    post{
-        always{
-            echo "Workflow completed successfully"
+        stage("Run the tests"){
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'origin/main'
+                }
+            }
+            steps{
+                bat "dotnet test --no-build --verbosity normal"
+            }
         }
     }
 }
