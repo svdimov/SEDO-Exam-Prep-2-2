@@ -31,5 +31,11 @@ pipeline {
                 bat "dotnet test --no-build --verbosity normal"
             }
         }
+    
+    }
+     post{
+        always{
+            echo "Workflow completed successfully"
+        }
     }
 }
